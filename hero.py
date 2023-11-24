@@ -31,7 +31,7 @@ class Hero:
         
         self.cameraOn = False
 
-    def changeMode(self):
+    def changeCamera(self):
         if self.cameraOn:
             self.cameraUnbind()
         else:
@@ -57,13 +57,28 @@ class Hero:
         self.hero.setPos(pos)
 
     def try_move(self,angle):
-        ...
+        pos = self.lookAt(angle)
+        if self.land.isEmpty(pos):
+            pos = self.land.findHighestEmpty(pos)
+            self.hero.setPos(pos)
+        else:
+            pos = pos[0], pos[1], pos[2] + 1
+            if self.land.isEmpty(pos):
+                self.hero.setPos(pos)
 
     def move_to(self, angle):
         if self.spectatorMode:
             self.just_move(angle)
         else:
             self.try_move(angle)
+
+    def changeMode(self):
+        #if self.spectatorMode:
+            #self.spectatorMode = False
+        #else:
+            #self.spectatorMode = True
+
+        self.spectatorMode = not self.spectatorMode
 
     def lookAt(self, angle):
         x = round(self.hero.getX())
@@ -126,8 +141,15 @@ class Hero:
         angle = (self.hero.getH()+270) % 360
         self.move_to(angle)
 
+    def up(self):
+        ...
+
+    def down(self):
+        ...
+
     def acceptEvents(self):
-        base.accept("c", self.changeMode)
+        base.accept(change_camera_key, self.changeCamera)
+        base.accept(change_mode_key, self.changeMode)
 
         base.accept(turn_left_key, self.turnLeft)
         base.accept(turn_left_key+'-repeat', self.turnLeft)
@@ -153,11 +175,8 @@ class Hero:
         base.accept(right_key, self.right)
         base.accept(right_key+'-repeat', self.right)
 
-
-
-
-
-change_mode_key = 'c'
+change_camera_key = 'c'
+change_mode_key = 'v'
 
 turn_left_key = "arrow_left"
 turn_right_key = "arrow_right"
